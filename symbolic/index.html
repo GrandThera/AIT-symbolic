@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grand Thera Symbolic Regression</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="../assets/icon.png">
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img class="logo-dark" src="../assets/grand-thera-logo-white.png" alt="Grand Thera">
+        <img class="logo-light" src="../assets/grand-thera-logo-primary.png" alt="Grand Thera">
+        <div class="title-block">
+          <h1>Symbolic Regression Workbench</h1>
+          <div class="subtitle">Manual engine | normalized data | interactive dependent variable analysis</div>
+        </div>
+      </div>
+      <div class="controls">
+        <label class="file-btn" for="fileInput">Upload CSV/XLS</label>
+        <input id="fileInput" type="file" accept=".csv,.tsv,.txt,.xls,.xlsx,.json">
+        <button class="btn" id="sampleBtn" type="button">Sample</button>
+        <button class="btn" id="formulaBtn" type="button">Formula</button>
+        <button class="btn" id="exportJsonBtn" type="button">Export JSON</button>
+        <button class="btn" id="paletteBtn" type="button">Ctrl K</button>
+        <button class="btn theme-toggle" id="themeBtn" type="button" aria-label="Switch to light mode" title="Switch to light mode"><span id="themeIcon" aria-hidden="true">&#9728;</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="metrics" aria-label="Model metrics">
+      <div class="metric">
+        <div class="metric-head"><span>Rows</span><button class="info-btn" data-info-title="Rows" data-info-body="Valid observations used after parsing, numeric conversion, missing-value imputation and winsorization.">i</button></div>
+        <strong id="mRows">0</strong><small id="mRowsSub">ready</small>
+      </div>
+      <div class="metric">
+        <div class="metric-head"><span>Variables</span><button class="info-btn" data-info-title="Variables" data-info-body="Numeric columns detected in the uploaded file or API response.">i</button></div>
+        <strong id="mVars">0</strong><small id="mVarsSub">numeric</small>
+      </div>
+      <div class="metric">
+        <div class="metric-head"><span>R2</span><button class="info-btn" data-info-title="R2" data-info-body="Share of dependent-variable variance explained by the selected symbolic formula.">i</button></div>
+        <strong id="mR2">--</strong><small id="mAdjR2">adj --</small>
+      </div>
+      <div class="metric">
+        <div class="metric-head"><span>RMSE</span><button class="info-btn" data-info-title="RMSE" data-info-body="Root mean squared error in the original dependent-variable scale.">i</button></div>
+        <strong id="mRmse">--</strong><small id="mMae">mae --</small>
+      </div>
+      <div class="metric">
+        <div class="metric-head"><span>BIC</span><button class="info-btn" data-info-title="BIC" data-info-body="Bayesian information criterion. Lower values favor simpler formulas with good fit.">i</button></div>
+        <strong id="mBic">--</strong><small id="mAic">aic --</small>
+      </div>
+      <div class="metric">
+        <div class="metric-head"><span>Prediction</span><button class="info-btn" data-info-title="Scenario Prediction" data-info-body="Current formula prediction after applying the interactive independent-variable controls.">i</button></div>
+        <strong id="mPred">--</strong><small id="mPredSub">scenario</small>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="stack">
+        <section class="panel" id="fitPanel">
+          <div class="panel-head">
+            <h2>Actual vs Symbolic Fit</h2>
+            <div class="panel-tools">
+              <label class="forecast-control">Forecast <input id="forecastSteps" type="number" min="0" max="120" step="1" value="12"></label>
+              <span class="pill" id="fitBadge">no model</span>
+              <button class="info-btn" data-info-title="Actual vs Symbolic Fit" data-info-body="Line plot comparing observed values with formula predictions. Hover to inspect a row.">i</button>
+              <button class="icon-btn" data-fullscreen="#fitPanel" title="Fullscreen">[]</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="chart-wrap"><canvas id="fitCanvas"></canvas></div>
+            <div class="range-controls">
+              <div class="range-control">
+                <label for="rangeStart">Start Obs</label>
+                <div class="range-row">
+                  <input class="scenario-slider" id="rangeStart" type="range" min="0" max="0" step="1" value="0">
+                  <output id="rangeStartLabel">0</output>
+                </div>
+              </div>
+              <div class="range-control">
+                <label for="rangeEnd">End Obs</label>
+                <div class="range-row">
+                  <input class="scenario-slider" id="rangeEnd" type="range" min="0" max="0" step="1" value="0">
+                  <output id="rangeEndLabel">0</output>
+                </div>
+              </div>
+            </div>
+            <div class="fit-formula" aria-label="Fitted formula summary">
+              <div class="formula-card">
+                <span>Fitted Symbolic Formula</span>
+                <img class="fit-math" id="fitFormulaPng" alt="Fitted formula rendered as PNG">
+                <div class="fit-latex" id="fitFormulaLatex">--</div>
+              </div>
+              <div class="formula-card">
+                <span>Selected Terms</span>
+                <div class="fit-term-list" id="fitFormulaTerms"></div>
+                <small id="fitFormulaSub">terms selected by BIC</small>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <aside class="stack">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Data Source</h2>
+            <div class="panel-tools"><button class="info-btn" data-info-title="Data Source" data-info-body="Upload CSV, text XLS exports, HTML table XLS, XML spreadsheet, XLSX in browsers with ZIP decompression support, or fetch JSON/CSV from an API endpoint.">i</button></div>
+          </div>
+          <div class="panel-body">
+            <div class="grid-form">
+              <div class="field">
+                <label for="dependentSelect">Dependent</label>
+                <select id="dependentSelect"></select>
+              </div>
+              <div class="field">
+                <label for="maxTerms">Max terms</label>
+                <select id="maxTerms">
+                  <option value="3">3</option>
+                  <option value="5" selected>5</option>
+                  <option value="7">7</option>
+                  <option value="10">10</option>
+                </select>
+              </div>
+            </div>
+            <div class="api-row">
+              <input id="dataApiUrl" type="url" placeholder="https://api.example.com/data.json">
+              <button class="btn" id="fetchApiBtn" type="button">Fetch</button>
+            </div>
+            <div class="status" id="statusLine">Loading sample data...</div>
+            <div class="section-label" style="margin-top:12px;">Independent variables</div>
+            <div class="variables" id="independentList"></div>
+            <button class="btn" id="fitBtn" type="button" style="width:100%; justify-content:center; margin-top:12px;">Fit Symbolic Model</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Interactive Scenario</h2>
+            <div class="panel-tools"><button class="info-btn" data-info-title="Interactive Scenario" data-info-body="Change independent-variable values and recompute the formula prediction immediately.">i</button></div>
+          </div>
+          <div class="panel-body">
+            <div class="scenario-list" id="scenarioList"></div>
+            <div class="prediction">
+              <div class="metric">
+                <div class="metric-head"><span>Formula Output</span></div>
+                <strong id="scenarioPred">--</strong><small>current</small>
+              </div>
+              <div class="metric">
+                <div class="metric-head"><span>Baseline</span></div>
+                <strong id="baselinePred">--</strong><small>median inputs</small>
+              </div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <section class="split">
+      <section class="panel" id="scatterPanel">
+        <div class="panel-head">
+          <h2>Observed vs Predicted</h2>
+          <div class="panel-tools">
+            <button class="info-btn" data-info-title="Observed vs Predicted" data-info-body="Scatter plot against the diagonal reference. Points close to the diagonal have smaller errors.">i</button>
+            <button class="icon-btn" data-fullscreen="#scatterPanel" title="Fullscreen">[]</button>
+          </div>
+        </div>
+        <div class="panel-body"><div class="chart-wrap compact"><canvas id="scatterCanvas"></canvas></div></div>
+      </section>
+
+      <section class="panel" id="residualPanel">
+        <div class="panel-head">
+          <h2>Residual Diagnostics</h2>
+          <div class="panel-tools">
+            <button class="info-btn" data-info-title="Residual Diagnostics" data-info-body="Residual sequence and zero line. Persistent structure indicates that the formula is missing signal.">i</button>
+            <button class="icon-btn" data-fullscreen="#residualPanel" title="Fullscreen">[]</button>
+          </div>
+        </div>
+        <div class="panel-body"><div class="chart-wrap compact"><canvas id="residualCanvas"></canvas></div></div>
+      </section>
+    </section>
+
+    <section class="split">
+      <section class="panel" id="statsPanel">
+        <div class="panel-head">
+          <h2>Statistical Summary</h2>
+          <div class="panel-tools">
+            <button class="info-btn" data-info-title="Statistical Summary" data-info-body="Observations: rows used. Parameters: intercept plus selected symbolic terms. R2: explained variance. Adjusted R2: R2 penalized by complexity. RMSE: typical error magnitude. MAE: average absolute error. MAPE: average percentage error. RSS: residual sum of squares. AIC/BIC: lower is better after complexity penalty.">i</button>
+            <button class="icon-btn" data-fullscreen="#statsPanel" title="Fullscreen">[]</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap"><table id="statsTable"></table></div>
+        </div>
+      </section>
+      <section class="panel" id="dependencePanel">
+        <div class="panel-head">
+          <h2>Dependence Diagnostics</h2>
+          <div class="panel-tools">
+            <button class="info-btn" data-info-title="Dependence Diagnostics" data-info-body="Pearson r is the linear correlation between each selected independent variable and the dependent variable. Mutual information is estimated manually by quantile-binning both variables and summing p(x,y) log(p(x,y)/(p(x)p(y))); higher values indicate stronger nonlinear dependence.">i</button>
+            <button class="icon-btn" data-fullscreen="#dependencePanel" title="Fullscreen">[]</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap"><table id="dependenceTable"></table></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="split">
+      <section class="panel" id="previewPanel" style="grid-column: 1 / -1;">
+        <div class="panel-head">
+          <h2>Data Preview</h2>
+          <div class="panel-tools">
+            <button class="info-btn" data-info-title="Data Preview" data-info-body="First rows after parsing. Numeric modeling uses cleaned and normalized versions internally.">i</button>
+            <button class="icon-btn" data-fullscreen="#previewPanel" title="Fullscreen">[]</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap"><table id="previewTable"></table></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="tooltip" id="tooltip"></div>
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="panel-head">
+        <h2 id="modalTitle">Info</h2>
+        <button class="icon-btn" id="modalClose" type="button">x</button>
+      </div>
+      <div class="panel-body" id="modalBody"></div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="formulaModalBackdrop">
+    <div class="modal formula-modal">
+      <div class="panel-head">
+        <h2>LaTeX Formula</h2>
+        <div class="panel-tools">
+          <button class="info-btn" data-info-title="LaTeX Formula" data-info-body="The fitted symbolic expression. z(var) means the variable after winsorization and z-score normalization.">i</button>
+          <button class="icon-btn" id="formulaModalClose" type="button">x</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="formula" id="latexFormula">y = --</div>
+        <img class="formula-image" id="formulaPng" alt="Final formula rendered as PNG">
+        <div class="terms" id="termList"></div>
+      </div>
+    </div>
+  </div>
+  <div class="palette" id="palette">
+    <div class="palette-box">
+      <input id="paletteSearch" type="text" placeholder="Run command">
+      <div id="commandList"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
