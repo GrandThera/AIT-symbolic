@@ -21,7 +21,7 @@ The motivation is to give researchers, quants, analysts, and technical operators
 The main visual experience is the self-contained dashboard:
 
 ```text
-dashboards/symbolic_regression_dashboard.html
+symbolic/index.html
 ```
 
 Open the file directly in a browser, or serve the repository locally and navigate to the dashboard. The interface follows a Palantir-like analytical style: dense dark panels, compact controls, formula rendering, hover-enabled diagnostics, scenario sliders, forecast controls, and fullscreen analytical frames.
