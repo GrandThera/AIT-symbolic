@@ -1,6 +1,6 @@
-# Grand Thera Symbolic Regression Workbench
+# Grand Thera AIT_Symbolic Regression Workbench
 
-Grand Thera Symbolic Regression Workbench is a compact open source research demo for exploring symbolic regression workflows in a clean analytical dashboard. It is designed for specialists who want to add a transparent, dependency-light symbolic modeling tool to their research toolkit, inspect fitted expressions, stress-test variables, and reason about model behavior from raw tabular data.
+Grand Thera AIT_Symbolic Regression Workbench is a compact open source research demo for exploring symbolic regression workflows in a clean analytical dashboard. It is designed for specialists who want to add a transparent, dependency-light symbolic modeling tool to their research toolkit, inspect fitted expressions, stress-test variables, and reason about model behavior from raw tabular data.
 
 This repository is not Grand Thera's final production technology. It does not include proprietary auto-calibration layers, production governance, internal model orchestration, enterprise data pipelines, or any closed Grand Thera decision systems. Its purpose is research-oriented: to show how symbolic regression concepts, statistical diagnostics, and interactive scenario analysis can be assembled into a small, inspectable tool.
 
@@ -8,7 +8,7 @@ This repository is not Grand Thera's final production technology. It does not in
 
 ## 1. Title and Description
 
-**Title:** Grand Thera Symbolic Regression Workbench
+**Title:** Grand Thera AIT_Symbolic Regression Workbench
 
 **Description:** The project provides a browser-based symbolic regression interface for loading sample, CSV, XLS/XLSX, or API-driven datasets; selecting a dependent variable; choosing independent variables; fitting symbolic candidate terms; and exploring the resulting prediction interactively. The core analytical flow is intentionally explicit, with data treatment, normalization, term generation, model fitting, diagnostics, and formula rendering kept visible to the user.
 
