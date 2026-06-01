@@ -1,4 +1,4 @@
-const API_BASE = 'https://thera-os-public-6d5652bhhq-uc.a.run.app';
+const API_BASE = 'https://api.thera-os.com';
 const state = {
   rows: [],
   columns: [],

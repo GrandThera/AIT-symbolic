@@ -130,6 +130,6 @@ Please keep changes focused, explain the modeling reason behind analytical chang
 
 **Author:** Grand Thera Technologies
 
-**License:** MIT. See [LICENSE] for details.
+**License:** MIT. See [LICENSE](./LICENSE)  for details.
 
 This open source repository is provided as a research and demonstration tool. It should not be interpreted as a release of Grand Thera's final internal technology stack, production modeling infrastructure, proprietary auto-calibration systems, or enterprise decision workflows.
