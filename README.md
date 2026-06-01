@@ -4,13 +4,13 @@ Grand Thera Symbolic Regression Workbench is a compact open source research demo
 
 This repository is not Grand Thera's final production technology. It does not include proprietary auto-calibration layers, production governance, internal model orchestration, enterprise data pipelines, or any closed Grand Thera decision systems. Its purpose is research-oriented: to show how symbolic regression concepts, statistical diagnostics, and interactive scenario analysis can be assembled into a small, inspectable tool.
 
-**Project status:** research demo / alpha. The dashboard is usable as a standalone prototype, but it should be reviewed, extended, and validated before any production or regulated decision workflow.
+**Project status:** research demo / alpha. The interface is usable as a standalone prototype, but it should be reviewed, extended, and validated before any production or regulated decision workflow.
 
 ## 1. Title and Description
 
 **Title:** Grand Thera Symbolic Regression Workbench
 
-**Description:** The project provides a browser-based symbolic regression dashboard for loading sample, CSV, XLS/XLSX, or API-driven datasets; selecting a dependent variable; choosing independent variables; fitting symbolic candidate terms; and exploring the resulting prediction interactively. The core analytical flow is intentionally explicit, with data treatment, normalization, term generation, model fitting, diagnostics, and formula rendering kept visible to the user.
+**Description:** The project provides a browser-based symbolic regression interface for loading sample, CSV, XLS/XLSX, or API-driven datasets; selecting a dependent variable; choosing independent variables; fitting symbolic candidate terms; and exploring the resulting prediction interactively. The core analytical flow is intentionally explicit, with data treatment, normalization, term generation, model fitting, diagnostics, and formula rendering kept visible to the user.
 
 The motivation is to give researchers, quants, analysts, and technical operators a practical way to investigate interpretable functional relationships without relying on a black-box UI. The workbench emphasizes clarity, manual statistical assumptions, and operational-style visualization over heavy framework abstraction.
 
@@ -18,17 +18,17 @@ The motivation is to give researchers, quants, analysts, and technical operators
 
 ## 2. Demonstration and Visual
 
-The main visual experience is the self-contained dashboard:
+The main visual experience is available through the main HTML page:
 
 ```text
-symbolic/index.html
+index.html
 ```
 
-Open the file directly in a browser, or serve the repository locally and navigate to the dashboard. The interface follows a Palantir-like analytical style: dense dark panels, compact controls, formula rendering, hover-enabled diagnostics, scenario sliders, forecast controls, and fullscreen analytical frames.
+Serve the repository locally and open the page in a browser. The interface follows a Palantir-like analytical style: dense dark panels, compact controls, formula rendering, hover-enabled diagnostics, scenario sliders, forecast controls, and fullscreen analytical frames.
 
 Suggested demo flow:
 
-1. Open the dashboard.
+1. Open the page.
 2. Load the built-in sample dataset.
 3. Select `demand` as the dependent variable.
 4. Fit the symbolic model.
@@ -37,19 +37,16 @@ Suggested demo flow:
 
 ## 3. Features
 
-- Standalone symbolic regression dashboard with no external JavaScript charting dependency.
-- Sample data generator for immediate experimentation.
+- Browser-based symbolic regression interface with no external JavaScript charting dependency.
+- Built-in sample dataset for immediate experimentation.
 - CSV, XLS/XLSX-style import path and API fetch input.
 - Dependent variable selector and independent variable controls.
-- Manual data treatment flow including numeric conversion, missing-value handling, winsorization, and z-score normalization.
-- Manual symbolic candidate generation, including normalized terms, powers, trigonometric transforms, interactions, and ratios.
-- Greedy term selection with model complexity awareness.
-- Ordinary least squares solved with in-house linear algebra.
+- Data loading, model fitting, prediction, and scenario flows through an external API.
 - Interactive scenario panel with sliders and live prediction output.
 - Forecast horizon control for forward simulation from the fitted expression.
 - Formula view with LaTeX text and a rendered mathematical formula image.
 - Statistical summary with R2, adjusted R2, RMSE, MAE, MAPE, RSS, AIC, and BIC.
-- Dependence diagnostics with Pearson correlation and mutual information calculated from first principles.
+- Dependence diagnostics with Pearson correlation and mutual information.
 - Observed vs predicted and residual diagnostic plots with hover behavior.
 - Data preview and export-oriented model inspection.
 - Dark/light theme toggle and compact operational UI.
@@ -59,10 +56,11 @@ Suggested demo flow:
 ### Requirements
 
 - A modern browser with support for standard HTML, CSS, and JavaScript.
-- Python 3.10+ if you want to run the repository tests or serve files locally.
+- Python 3.10+ if you want to serve files locally.
 - Git for cloning the repository.
+- Access to the external Symbolic API used by the frontend.
 
-No Node.js build step is required for the current dashboard because the main workbench is a self-contained HTML file.
+No Node.js build step is required for the current frontend because it is served as static HTML, CSS, and JavaScript files.
 
 ### Step by step
 
@@ -73,11 +71,10 @@ git clone https://github.com/GrandThera/symbolic.git
 cd symbolic
 ```
 
-
 Serve the repository locally:
 
 ```bash
-python -m http.server 8000
+python3 -m http.server 8000
 ```
 
 Then open:
@@ -86,9 +83,27 @@ Then open:
 http://127.0.0.1:8000/symbolic
 ```
 
-## 5. How to Use
 
-1. Open the dashboard in a modern browser.
+
+## 5. API Dependency
+
+This frontend consumes an external API for data processing and analytical responses.
+
+The API is responsible for:
+
+- parsing uploaded datasets;
+- handling CSV/XLS/XLSX/API-driven inputs;
+- detecting numeric columns;
+- applying numeric cleanup and missing-value treatment;
+- fitting the symbolic regression model;
+- evaluating symbolic formulas;
+- returning predictions, residuals, metrics, diagnostics, and scenario forecasts.
+
+If the API base URL changes, update the corresponding API URL in the frontend JavaScript file.
+
+## 6. How to Use
+
+1. Open the page in a modern browser.
 2. Click `Sample` to load the built-in demonstration dataset, or upload your own CSV/XLS/XLSX file.
 3. Choose the dependent variable.
 4. Select the independent variables that should be available to the symbolic model.
@@ -99,37 +114,39 @@ http://127.0.0.1:8000/symbolic
 9. Adjust the forecast horizon to inspect forward behavior.
 10. Inspect diagnostics such as observed vs predicted, residuals, statistical summary, dependence metrics, and data preview.
 
-## 6. Technologies Used
+## 7. Technologies Used
 
-- HTML5 for the standalone application shell.
+- HTML5 for the application structure.
 - CSS3 for the Grand Thera / Palantir-like visual system.
-- Vanilla JavaScript for parsing, modeling, plotting, formula rendering, and interaction.
-- Canvas for charts and mathematical formula rendering.
-- Python for the repository package and test workflow.
-- No third-party symbolic regression engine, charting library, or machine learning framework is required by the dashboard.
+- Vanilla JavaScript for API communication, interaction, plotting, and formula display.
+- Fetch API for external API requests.
+- FormData API for file upload requests.
+- Browser File API for local file selection.
+- Canvas/SVG for visual rendering.
+- Python `http.server` for local static file serving during development.
 
-The analytical logic is intentionally implemented in a readable way so researchers can inspect and modify the assumptions instead of treating the model as a sealed dependency.
+No third-party frontend framework, charting library, or build tool is required by the interface.
 
-## 7. How to Contribute
+## 8. How to Contribute
 
 Contributions are welcome when they preserve the research-demo nature of the project and keep the modeling assumptions transparent.
 
 Good contribution areas include:
 
-- improving import robustness for real-world CSV/XLS/XLSX files;
-- adding focused tests for the symbolic regression engine;
-- improving numerical stability in the OLS and feature normalization steps;
-- extending formula rendering while keeping it dependency-light;
-- adding small, well-documented candidate term families;
+- improving import and API error handling;
+- improving interface usability;
+- improving loading states;
 - improving accessibility and responsive layout;
-- documenting limitations and statistical assumptions.
+- improving chart rendering and hover behavior;
+- documenting expected API contracts;
+- adding focused frontend validation tests.
 
-Please keep changes focused, explain the modeling reason behind analytical changes, and avoid adding heavy dependencies unless there is a strong research justification.
+Please keep changes focused, explain the modeling reason behind analytical-display changes, and avoid adding heavy dependencies unless there is a strong research justification.
 
-## 8. Authors and License
+## 9. Authors and License
 
 **Author:** Grand Thera Technologies
 
-**License:** MIT. See [LICENSE](./LICENSE)  for details.
+**License:** MIT. See [LICENSE](./LICENSE) for details.
 
 This open source repository is provided as a research and demonstration tool. It should not be interpreted as a release of Grand Thera's final internal technology stack, production modeling infrastructure, proprietary auto-calibration systems, or enterprise decision workflows.
