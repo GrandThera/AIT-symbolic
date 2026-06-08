@@ -1359,15 +1359,15 @@ function renderCommands() {
 
 async function loadSampleCsv() {
   try {
-    setStatus("Loading sample.csv...", "Working");
+    setStatus("Loading data/sample.csv...", "Working");
 
-    const response = await fetch("sample.csv", { cache: "no-store" });
+    const response = await fetch("data/sample.csv", { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const text = await response.text();
-    loadRows(parseDelimited(text), "sample.csv");
+    loadRows(parseDelimited(text), "data/sample.csv");
   } catch (error) {
-    setStatus(error.message || "Could not load sample.csv.", "Sample load error");
+    setStatus(error.message || "Could not load data/sample.csv.", "Sample load error");
   }
 }
 
